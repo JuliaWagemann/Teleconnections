@@ -1,6 +1,7 @@
 #load necessary libaries
 
 library(kohonen)
+library(Reot)
 library(ncdf)
 library(RNetCDF)
 library(ncdf4)
@@ -15,7 +16,7 @@ setwd(path)
 
 fileList <- list.files(path, pattern=".nc")
 filenumber<-length(fileList)
-set.seed(300)
+set.seed(30)
 
 #import from the ncdf
 
@@ -23,7 +24,7 @@ dataMatrix <- matrix(nrow=12*filenumber,ncol=65160)
 count<-1
 
 for (files in 1:filenumber){
-        t2m_anomaly <- open.ncdf(fileList[2], write=FALSE)
+        t2m_anomaly <- open.ncdf(fileList[files], write=FALSE)
         t2m_var <- get.var.ncdf(t2m_anomaly, "t2m_anomaly")
         
         for(i in 1:12){
@@ -33,6 +34,13 @@ for (files in 1:filenumber){
                 count<-count+1
         }
 }
+
+#normalize anomalies
+for (k in 1:65160){
+        std=sd(dataMatrix[,k], na.rm=TRUE)
+        dataMatrix[,k]<-dataMatrix[,k]/std
+}
+
 
 #define the dimensions of the som grid
 somrows<-3
@@ -74,7 +82,7 @@ netCDF_varDef <- ncvar_def("t2m.som", units= "deg",dim=list(x,y,soms), missval=N
                            longname="t2m.som", prec= 'double', verbose=FALSE)
 
 # Create the actual netCDF output file
-netCDFFile <- nc_create("som.nc", netCDF_varDef, force_v4=FALSE,verbose=FALSE)
+netCDFFile <- nc_create("som_norm.nc", netCDF_varDef, force_v4=FALSE,verbose=FALSE)
 
 # fill the created netCDF file with the actual content --> calculated anomalies
 ncvar_put(netCDFFile, netCDF_varDef, as.matrix(brick(st)),verbose=FALSE)
