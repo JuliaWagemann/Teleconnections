@@ -51,7 +51,10 @@ for(i in 1:length(fileList)){
 }
 
 # dataMatrix is scaled based on the number of columns of the matrix
-datMat.sc <- scale(dataMatrix)
+for (k in 1:nrOfPixels){
+        std=sd(dataMatrix[,k], na.rm=TRUE)
+        dataMatrix[,k]<-dataMatrix[,k]/std
+}
 
 # Training of the SOM for the entire amount of input data
 # Parameters to be carefully chosen: 
