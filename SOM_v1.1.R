@@ -19,8 +19,8 @@ nrOfTimeSteps <- length(fileList)*12
 somRows <- 4
 somCols <- 3
 
-trainingRate <- 500
-neighbourhoodRadius <- 5
+trainingRate <- 50
+neighbourhoodRadius <- 1
 
 geoLat <- 181
 geoLon <- 360
