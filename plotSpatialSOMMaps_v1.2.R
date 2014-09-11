@@ -19,24 +19,23 @@ grid <- readOGR(dsn=paste(path,"shapefiles",sep=""),layer="ne_110m_graticules_30
 
 my.colors <- colorRampPalette(c("darkblue","blue","lightblue","beige","tomato","red","darkred"))
 
-
 for(i in fileList){
-        fileName <- substr(i,10,nchar(i)-3)
+        fileName <- substr(i,9,nchar(i)-3)
         # Store netCDF data directly into a raster stack
         st <- stack(paste(path_TECPC,
                           i,sep=""),
-                    bands=c(1:12),varname="Tair.som")
+                    bands=c(1:12),varname="T2M.som")
         
         # ncdf data are stored from longitude 0 to 360 --> therefore the raster objects stored 
         # in the rasterstack have to be rearranged to the extent -180 to 180 longitude to match with
         # world boundary layer
         # Within the loop, each raster layer within the raster stack is divided into two parts and
         # rearranged - a new raster stack is built
-        ext1 <- extent(c(-0.5,179.5,-90.5,90.5))
-        ext2 <- extent(c(179.5,360,-90.5,90.5))
+        ext1 <- extent(c(0,180,-90,90))
+        ext2 <- extent(c(181,360,-90,90))
         list <- c(st$X1,st$X2, st$X3)
         st_new <- stack()
-        for(i in 1:9){
+        for(i in 1:12){
                 tempRast_1 <- crop(st[[i]],ext1)
                 tempRast_2 <- crop(st[[i]],ext2)
                 tempRast_11 <- shift(tempRast_1, x=-0.5)
@@ -47,14 +46,14 @@ for(i in fileList){
         
         # Naming of the raster layers within the raster stack is changed
         names(st_new) <- c("SOM1", "SOM2", "SOM3", "SOM4", 
-                           "SOM5", "SOM6", "SOM7", "SOM8", "SOM9") , "SOM10", "SOM11","SOM12")
+                           "SOM5", "SOM6", "SOM7", "SOM8", "SOM9", "SOM10", "SOM11","SOM12")
         
         ###############################################################################
         # Plotting
         ###############################################################################
         
         #define individual colours for plot
-        colourPalette=c(rev(brewer.pal(10,"RdBu")))
+        colourPalette=c(rev(brewer.pal(20,"RdYlBu")))
         colourPalette=my.colors(100)
         # define the breaks for the raster colour bar
         brks <- c(-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5)
@@ -64,81 +63,84 @@ for(i in fileList){
              width=1700,height=1650, units="px",
              pointsize=10, res=300)
         
-        par(mfrow=c(3,3),mar=c(0,2,0,0.5), oma=c(3,2,0,1),bty="n")
+        par(mfrow=c(4,3),cex=1.1,mex=1,bty="n",xaxt="n",
+            main="")
         #1
-        plot(st_new$SOM1,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
-             axes=FALSE,bigplot=c(0.05,0.9,0,1),breaks=brks)
+        plot(st_new$SOM1,col=my.colors(100),ext=extent(c(-180,180,-90,90)),legend=FALSE,
+             axes=FALSE,breaks=brks,main="",maxnl=1)
         plot(wmap,add=TRUE)
-        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-2.45)
+#        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-2.45)
         axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
         #2
         plot(st_new$SOM2,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
-             axes=FALSE,bigplot=c(0.05,0.9,0,1), breaks=brks)
+             axes=FALSE, breaks=brks,main="",xaxt="n")
         plot(wmap,add=TRUE)
-        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-2.45)
-        axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
+#        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-2.45)
+#        axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
         #3
         plot(st_new$SOM3,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
-             axes=FALSE,bigplot=c(0.05,0.9,0,1),breaks=brks)
+             axes=FALSE,breaks=brks,main="")
         plot(wmap,add=TRUE)
-        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-2.45)
-        axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
+#        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-2.45)
+#        axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
         #4
+        par(mar=c(0,0,0,0))
         plot(st_new$SOM4,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
-             axes=FALSE,bigplot=c(0.05,0.9,0.1,1),breaks=brks)
+             axes=FALSE,breaks=brks,main="")
         plot(wmap,add=TRUE)
-        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-1.8)
+#        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-1.8)
         axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
         #5
         plot(st_new$SOM5,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
-             axes=FALSE,bigplot=c(0.05,0.9,0.1,1),breaks=brks)
+             axes=FALSE,breaks=brks,main="")
         plot(wmap,add=TRUE)
-        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-1.8)
-        axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
+#        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-1.8)
+#        axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
         #6
         plot(st_new$SOM6,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
-             axes=FALSE,bigplot=c(0.05,0.9,0.1,1),breaks=brks)
+             axes=FALSE,breaks=brks)
         plot(wmap,add=TRUE)
-        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-1.8)
-        axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
+ #       axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-1.8)
+ #       axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
         #7
         plot(st_new$SOM7,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
-             axes=FALSE,bigplot=c(0.05,0.9,0.1,1),breaks=brks)
+             axes=FALSE,breaks=brks)
         plot(wmap,add=TRUE)
-        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-1.85)
+ #       axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-1.85)
         axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
         #8
         plot(st_new$SOM8,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
-             axes=FALSE,bigplot=c(0.05,0.9,0.1,1),breaks=brks)
+             axes=FALSE,breaks=brks)
         plot(wmap,add=TRUE)
-        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-1.85)
-        axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
+ #       axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-1.85)
+ #       axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
         #9
         plot(st_new$SOM9,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
-             axes=FALSE,bigplot=c(0.05,0.9,0.1,1),breaks=brks)
+             axes=FALSE,breaks=brks,xlab="")
         plot(wmap,add=TRUE)
-        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-1.85)
-        axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
+#        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-1.85)
+#        axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
         #10
+
         plot(st_new$SOM10,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
-             axes=FALSE,bigplot=c(0.05,0.9,0.25,1),breaks=brks)
+             axes=FALSE,breaks=brks,main="")
         plot(wmap,add=TRUE)
-        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-.9)
+        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-0.05)
         axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
         #11
         plot(st_new$SOM11,col=colourPalette,ext=extent(c(-180,180,-90,90)), 
-             axes=FALSE,legend=FALSE,bigplot=c(0.05,0.9,0.25,1),breaks=brks)
+             axes=FALSE,legend=FALSE,breaks=brks)
         plot(wmap,add=TRUE)
-        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-.9)
-        axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
-        plot(st_new$SOM11,legend.only=TRUE,zlim=c(-4, -2, -1.5,-1,-0.5,0,0.5,1,1.5,2,4),col=colourPalette, horizontal=TRUE,
-             legend.mar=0,legend.width=3,nlevels=10,smallplot=c(0.05,0.9,0,0.1))
+        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=0.01)
+ #       axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
+        plot(st_new$SOM11,legend.only=TRUE,zlim=c(-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5),col=colourPalette, horizontal=TRUE,
+             legend.mar=0,legend.width=3,smallplot=c(0.01,0.8,0,0.1))
         #12
         plot(st_new$SOM12,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
-             axes=FALSE,bigplot=c(0.05,0.9,0.25,1),breaks=brks)
+             axes=FALSE,breaks=brks,main="")
         plot(wmap,add=TRUE)
-        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-.9)
-        axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
+        axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=0.01)
+ #       axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
         
         dev.off()
 }
