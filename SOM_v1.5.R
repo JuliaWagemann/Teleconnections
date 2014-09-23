@@ -7,10 +7,10 @@ library(raster)
 
 
 
-path <- "C:/Users/julia_francesca/Documents/Data/2_Anomalies/ERA_Interim/Geopotential_500/"
+path <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/2_Anomalies/ERA_Interim/sea_level_pressure"
 setwd(path)
 
-path1 <- "C:/Users/julia_francesca/Documents/Data/4_Results/SOM/ERA_interim/GP500/"
+path1 <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/4_Results/SOM/ERA_interim/SLP/"
 
 fileList <- list.files(path, pattern=".nc")
 
@@ -30,9 +30,9 @@ geoLat <- 181
 geoLon <- 360
 nrOfPixels <- geoLat*geoLon
 
-varName <- "GP500.som"
-varUnit <- "hPa"
-varDesc <- "SOM nodes of geopotential anomalies at 500 hPa"
+varName <- "SLP.som"
+varUnit <- "Pa"
+varDesc <- "SOM nodes of sea level pressure anomalies"
 
 #ncdfName <- "som_SLPA_rlen_1000_radius_3.nc"
 ########################################################################
@@ -47,7 +47,7 @@ dataMatrix <- matrix(ncol=nrOfPixels, nrow=nrOfTimeSteps)
 t <- 1  #initialize a count variable
 for(m in fileList){
         GP_anomaly <- open.ncdf(m, write=FALSE)
-        GP_var <- get.var.ncdf(GP_anomaly, "GP500_anomaly")
+        GP_var <- get.var.ncdf(GP_anomaly, "SLP_anomaly")
         for(z in 1:12){
                 tempRaster <- GP_var[,,z]
                 dataMatrix[t,] <- tempRaster
@@ -71,8 +71,8 @@ for (k in 1:nrOfPixels){
 # - radius:     radius of the neighbourhood
 # - toroidal:   if TRUE --> edges of the neighbourhood map are joined
 # - n.hood:     shape of the neighbourhood - either "circular" or "square"
-outputFile <- file(paste(path1,"GP500_SOM_evaluation.txt"),open="w")
-outputFile_2 <- file(paste(path1,"GP500_freq.txt"),open="w")
+outputFile <- file(paste(path1,"SLP_SOM_evaluation.txt"),open="w")
+outputFile_2 <- file(paste(path1,"SLP_freq.txt"),open="w")
 writeLines(c("SOM_size,radius,q-error,topo-error"),outputFile,sep="\n")
 
 set.seed(20)
@@ -120,7 +120,7 @@ tiff(filename=paste(path1,"training_process_somgrid_",gridSize_1,"x",
 plot(GPA.som,type="changes")
 dev.off()
 
-ncdfName <- paste(path1,"som_GP500_somgrid_",gridSize_1,"x",
+ncdfName <- paste(path1,"som_SLP_somgrid_",gridSize_1,"x",
                   gridSize_2,"_radius_",neighbourhoodRadius,".nc",sep="")
 
 # NetCDF Output preparation
