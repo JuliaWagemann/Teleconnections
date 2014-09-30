@@ -7,15 +7,16 @@ library(rasterVis)
 library(rgdal)
 library(fields)
 
-path <- "F:/Julia/Data/"
+path <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/3_shapefiles"
 setwd(path)
 
-path_TECPC <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/SOM_exploration/Tair_2m/"
+path_TECPC <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/4_Results/SOM/ERA_interim/GP500/"
+
 fileList <- list.files(path_TECPC,pattern=".nc")
 # Shapefiles from Natural Earth (http://www.naturalearthdata.com/features/) for World
 # boundary layers and a raster grid of 30 degrees
-wmap <- readOGR(dsn=paste(path,"shapefiles",sep=""), layer="ne_110m_land")
-grid <- readOGR(dsn=paste(path,"shapefiles",sep=""),layer="ne_110m_graticules_30")
+wmap <- readOGR(dsn=path, layer="ne_110m_land")
+grid <- readOGR(dsn=path,layer="ne_110m_graticules_30")
 
 my.colors <- colorRampPalette(c("darkblue","blue","lightblue","beige","tomato","red","darkred"))
 
@@ -25,7 +26,7 @@ for(i in fileList){
         # Store netCDF data directly into a raster stack
         st <- stack(paste(path_TECPC,
                           i,sep=""),
-                    bands=c(1:12),varname="Tair.som")
+                    bands=c(1:12),varname="GP500.som")
         
         # ncdf data are stored from longitude 0 to 360 --> therefore the raster objects stored 
         # in the rasterstack have to be rearranged to the extent -180 to 180 longitude to match with
@@ -36,7 +37,7 @@ for(i in fileList){
         ext2 <- extent(c(179.5,360,-90.5,90.5))
         list <- c(st$X1,st$X2, st$X3)
         st_new <- stack()
-        for(i in 1:9){
+        for(i in 1:12){
                 tempRast_1 <- crop(st[[i]],ext1)
                 tempRast_2 <- crop(st[[i]],ext2)
                 tempRast_11 <- shift(tempRast_1, x=-0.5)
@@ -47,7 +48,7 @@ for(i in fileList){
         
         # Naming of the raster layers within the raster stack is changed
         names(st_new) <- c("SOM1", "SOM2", "SOM3", "SOM4", 
-                           "SOM5", "SOM6", "SOM7", "SOM8", "SOM9") , "SOM10", "SOM11","SOM12")
+                           "SOM5", "SOM6", "SOM7", "SOM8", "SOM9" , "SOM10", "SOM11","SOM12")
         
         ###############################################################################
         # Plotting
@@ -57,14 +58,14 @@ for(i in fileList){
         colourPalette=c(rev(brewer.pal(10,"RdBu")))
         colourPalette=my.colors(100)
         # define the breaks for the raster colour bar
-        brks <- c(-2.5,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5)
-        brks <- seq(-2.5,2.5,length.out=100)
+        brks <- c(-4,-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,4)
+        brks <- seq(-3,3,length.out=100)
         
         tiff(filename=paste(path_TECPC,"SOM_nodes_",fileName,".tiff",sep=""),
              width=1700,height=1650, units="px",
              pointsize=10, res=300)
         
-        par(mfrow=c(3,3),mar=c(0,2,0,0.5), oma=c(3,2,0,1),bty="n")
+        par(mfrow=c(4,3),mar=c(0,2,0,0.5), oma=c(3,2,0,1),bty="n")
         #1
         plot(st_new$SOM1,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
              axes=FALSE,bigplot=c(0.05,0.9,0,1),breaks=brks)
@@ -131,8 +132,9 @@ for(i in fileList){
         plot(wmap,add=TRUE)
         axis(side=1,at=c(-179, -90, 0, 90, 180),labels=c(-180,-90,0,90,180),line=-.9)
         axis(side=2,at=c(-90,-45, 0,45,90),labels=c(-90,-45,0,45,90),line=0)
-        plot(st_new$SOM11,legend.only=TRUE,zlim=c(-4, -2, -1.5,-1,-0.5,0,0.5,1,1.5,2,4),col=colourPalette, horizontal=TRUE,
-             legend.mar=0,legend.width=3,nlevels=10,smallplot=c(0.05,0.9,0,0.1))
+        plot(st_new$SOM11,legend.only=TRUE,
+             col=colourPalette, horizontal=TRUE, zlim=c(-3,-2,-1,0,1,2,3),
+             legend.width=3,nlevels=10,smallplot=c(0.05,0.9,0,0.1))
         #12
         plot(st_new$SOM12,col=colourPalette,ext=extent(c(-180,180,-90,90)),legend=FALSE,
              axes=FALSE,bigplot=c(0.05,0.9,0.25,1),breaks=brks)

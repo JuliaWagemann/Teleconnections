@@ -5,11 +5,10 @@ library(fields)
 library(ncdf4)
 
 # Load functions needed for anomaly calculation
-source("F:/Julia/Data/anomalies_functions.R")
+source("C:/Users/Julia Wagemann/Desktop/Teleconnections/anomalies_functions.R")
 
 # Set working directory
-path <- "F:/Julia/Data/ERA_interim/Tair_2m/"
-path <- "F:/Julia/Data/ERA_interim/1979_2013/GP/GP_500/"
+path <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/1_Raw_Data_NCDF/ERA_Interim/Tair_2m"
 setwd(path)
 
 
@@ -25,7 +24,6 @@ varDescription <- "Air temperature 2m anomalies" # Description of the variable i
 fileName <- "Tair_2m_anomaly_" # Beginning of the individual netcdf file name --> for each year, a running number will be concatenated
 NA_val <- -32767 # NA value of the input file --> will be set to NAs
 parName <- "t2m"
-=======
 nrOfYears <- 35 # Please adjust here the amount of years over which the anomalies are calculated
 varName <- "GP500_anomaly" # Name of the variable name as indicated in the netcdf file
 varUnit <- "m**2 s**-2" # Unit of the variable stored in the netcdf file

@@ -7,10 +7,10 @@ library(raster)
 
 
 
-path <- "C:/Users/julia_francesca/Documents/Data/2_Anomalies/ERA_Interim/Tair_2m/"
+path <-"//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/2_Anomalies/ERA_Interim/Tair_2m/"
 setwd(path)
 
-path1 <- "C:/Users/julia_francesca/Documents/SOM_exploration/Tair_2m/"
+path1 <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/SOM_exploration/Tair_2m/"
 
 fileList <- list.files(path, pattern=".nc")
 
@@ -23,10 +23,12 @@ nrOfTimeSteps <- length(fileList)*12
 
 trainingRate <- 500
 neighbourhoodRadius <- c(1,3,5,10)
+neighbourhoodRadius <- 5
 
 gridSize_1 <- c(3,3,4,4,5)
 gridSize_2 <- c(3,4,4,5,5)
 gridSize <- list(firstCol=gridSize_1,secondCol=gridSize_2)
+
 
 geoLat <- 181
 geoLon <- 360
@@ -124,7 +126,7 @@ for(i in 1:length(gridSize_1)){
     dev.off()
     
     ncdfName <- paste(path1,"som_Tair_somgrid_,",gridSize$firstCol[i],"x",
-                      gridSize$secondCol[i],"_radius_",j,".nc",sep="")
+                      gridSize$secondCol[i],"_radius_",j,"_2.nc",sep="")
     
     # NetCDF Output preparation
     lat <- GP_anomaly$dim$lat$vals
@@ -163,8 +165,9 @@ plot(GPA.som,type="counts")
 # shows the sum of the distances to all immediate neighbours --> also known as a U-matrix plot
 plot(GPA.som,type="dist.neighbours")
 # shows where objects are mapped. Uses the classif argument and needs labels or pchs
-plot(GPA.som$unit.classif,type="mapping")
+plot(GPA.som$unit.classif)
 
+freq <- c(GPA.som$unit.classif)
 
 # Each codebook vector is extracted from the som-object, rearranged in a NxM matrix and then plotted as
 # raster field
