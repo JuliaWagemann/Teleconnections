@@ -10,7 +10,7 @@ library(fields)
 path <- "F:/Julia/Data/"
 setwd(path)
 
-path_TECPC <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/SOM_exploration/Tair_2m/"
+path_TECPC <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/4_Results/SOM/ERA_interim/Tair2m/"
 fileList <- list.files(path_TECPC,pattern=".nc")
 # Shapefiles from Natural Earth (http://www.naturalearthdata.com/features/) for World
 # boundary layers and a raster grid of 30 degrees
@@ -24,7 +24,7 @@ for(i in fileList){
         # Store netCDF data directly into a raster stack
         st <- stack(paste(path_TECPC,
                           i,sep=""),
-                    bands=c(1:12),varname="T2M.som")
+                    bands=c(1:12),varname="Tair.som")
         
         # ncdf data are stored from longitude 0 to 360 --> therefore the raster objects stored 
         # in the rasterstack have to be rearranged to the extent -180 to 180 longitude to match with
