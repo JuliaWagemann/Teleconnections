@@ -1,51 +1,39 @@
+################################################################################
+# Name:         aggregate_1deg.R
+# version:      v1.0
+# Author:       Julia Wagemann
+# Date:         2014/10/01
+################################################################################
 library(ncdf)
 library(RNetCDF)
 library(ncdf4)
 library(fields)
 library(raster)
 
+source("C:/Users/Julia Wagemann/Desktop/Teleconnections/anomalies_functions_v1.1.R")
 
-path <-"//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/1_Raw_Data_NCDF/ERA_Interim/Total_precipitation/"
+path <-"//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/1_Raw_Data_NCDF/CCI/SLA/1deg/"
 setwd(path)
 
 fileList <- list.files(path,pattern=".nc")
 
-varName <- "SLP_anomaly_3deg"
-varUnit <- "Pa"
-varDesc <- "Sea level pressure anomalies in Pa - 3 deg spatial resolution"
-
-lat <- rev(seq(-89,90,3))
-lon <- seq(-179,180,3)
-
-aggregate <- function(fileList,aggregateFactor,fun,lat,lon,)
-for(i in fileList_precip){
-        ncdf <- open.ncdf(paste(precip_path,i,sep=""), write=FALSE)
-
-        ncdf_var <- get.var.ncdf(ncdf, "SLP_anomaly")
-        st <- stack()
-        for(z in 1:12){
-                tempRaster <- raster(ncdf_var[,,z])
-                aggRaster <- aggregate(tempRaster,fact=3,fun=mean,expand=FALSE,na.rm=FALSE)
-                st <- addLayer(st,aggRaster)        
-        }
-
-        ncdfName <- paste(precip_path,substr(i,1,nchar(i)-3),"_3deg.nc",sep="")
-             
-        # Define the dimensions of the resulting netCDF file
-        x <- ncdim_def("lon", "degrees",lon)
-        y <- ncdim_def("lat", "degrees", lat)
-        anomalies <- ncdim_def("Month", " ", c(1:12))
-        
-        # Define Variable which is written to the netCDF file
-        netCDF_varDef <- ncvar_def(varName, units=varUnit,dim=list(x,y,anomalies), missval=NA,
-                                   longname=varDesc, prec= 'double', verbose=FALSE)
-        
-        # Create the actual netCDF output file
-        netCDFFile <- nc_create(ncdfName, netCDF_varDef, force_v4=FALSE,verbose=FALSE)
-        
-        # fill the created netCDF file with the actual content --> calculated anomalies
-        ncvar_put(netCDFFile, netCDF_varDef, as.matrix(brick(st)),verbose=FALSE)
-        
-        # close the created netCDF file
-        nc_close(netCDFFile)           
-}
+######################################################################################################
+# Call of function "aggregate1"
+# Function aggregates raster datasets (given by a netCDF file list) to a coarser resolution
+# Following parameters have to be specified:
+# fileList      -       list of netCDF files to be processed
+# fun           -       specify aggregation method (in general: "mean", e.g. "sum" for precipitation fields)
+# aggVal        -       specify the aggregation value, factor of aggregation
+# timeUnit      -       specify the unit of the time dimension in the resulting netCDF file
+# varName       -       specify variable name in the resulting netCDF file
+# varUnit       -       specify variable unit in the resulting netCDF file
+# varDescription-       provide detailed description of netCDF variable
+# timeStepVec   -       provide number of layers in resulting netCDF file (in general: c(1:12))
+# degrees       -       aggregation value for lat/lon vectors
+# ncdfMode      -       how is the structure of the input netCDF files - e.g "multiple", if the netcdf file has
+#                       one variable, with various layers and "single", if the netcdf file has various layers
+# addfileName   -       specify what is added to the resulting file name
+#####################################################################################################
+aggregate1(fileList=fileList,fun=mean,aggVal=3,timeUnit="month",varName="SLA",varUnit="m",
+           varDescription="Monthly sea level anomalies in m",timeStepVec=c(1:12),degrees=3,ncdfMode="multiple",
+           addFileName="_3deg")
