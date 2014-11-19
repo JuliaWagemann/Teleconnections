@@ -10,9 +10,9 @@ library(fields)
 path <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/3_shapefiles"
 setwd(path)
 
-path_TECPC <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/4_Results/SOM/ERA_interim/GP500/"
+path_TECPC <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/4_Results/SOM/ERA_interim/Tair2m/"
 
-fileList <- list.files(path_TECPC,pattern=".nc")
+fileList <- list.files(path_TECPC,pattern="_1deg.nc")
 # Shapefiles from Natural Earth (http://www.naturalearthdata.com/features/) for World
 # boundary layers and a raster grid of 30 degrees
 wmap <- readOGR(dsn=path, layer="ne_110m_land")
@@ -26,7 +26,7 @@ for(i in fileList){
         # Store netCDF data directly into a raster stack
         st <- stack(paste(path_TECPC,
                           i,sep=""),
-                    bands=c(1:12),varname="GP500.som")
+                    bands=c(1:12),varname="SOMs")
         
         # ncdf data are stored from longitude 0 to 360 --> therefore the raster objects stored 
         # in the rasterstack have to be rearranged to the extent -180 to 180 longitude to match with
@@ -34,7 +34,7 @@ for(i in fileList){
         # Within the loop, each raster layer within the raster stack is divided into two parts and
         # rearranged - a new raster stack is built
         ext1 <- extent(c(-0.5,179.5,-90.5,90.5))
-        ext2 <- extent(c(179.5,360,-90.5,90.5))
+        ext2 <- extent(c(179,360,-90.5,90.5))
         list <- c(st$X1,st$X2, st$X3)
         st_new <- stack()
         for(i in 1:12){

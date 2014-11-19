@@ -18,7 +18,7 @@ geoLon <- 120
 nrOfPixels <- geoLat*geoLon
 
 #what are the input and output paths?
-inputPath <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/2_Anomalies/ERA_Interim/Tair_2m"
+inputPath <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/3_Data/2_Anomalies/ERA_Interim/monthly/2_SLP/3deg"
 outputPath <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/EOT"
 
 #what is the input variable name and units?
@@ -33,7 +33,7 @@ varDesc <- "EOT of Temperature at 2m anomalies"
 
 # move to the input folder and list the ncdf files
 setwd(inputPath)
-fileList <- list.files(inputPath, pattern="_3deg.nc")
+fileList <- list.files(inputPath, pattern=".nc")
 
 nrOfTimeSteps <- length(fileList)*12
 
@@ -46,7 +46,7 @@ for (files in 1:length(fileList)){
         var <- get.var.ncdf(anomaly, varNcdfName)
         
         for(i in 1:12){
-                temp<-var[,,i]w
+                temp<-var[,,i]
                 temp_r<-raster(temp)
                 temp_w<-geoWeight(temp_r)
                 dataStack <- addLayer(dataStack, temp_w)

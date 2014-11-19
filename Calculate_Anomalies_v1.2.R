@@ -1,3 +1,4 @@
+%%R
 ################################################################################
 # Name:         Calculate_Anomalies_v1.2.R
 # version:      v1.2
@@ -15,7 +16,7 @@ library(ncdf4)
 source("C:/Users/Julia Wagemann/Desktop/Teleconnections/anomalies_functions_v1.1.R")
 
 # Set working directory
-path <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/1_Raw_Data_NCDF/CCI/SLA/3deg/"
+path <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/3_Data/1_Raw_Data_NCDF/ERA_Interim/Total_Precipitation/3deg"
 setwd(path)
 
 fileList <- list.files(path)
@@ -42,8 +43,8 @@ lon <- getLon(fileList[1])
 #                       monthly anomalies of ERA-interim (1:12) 
 # fileName      -       provide file name of resulting netCDF file
 #####################################################################################################
-anomalizeToNCDF(fileList=fileList,timeStepVec=c(9:11),fun=mean,yearsVec=1:18,seasonMonth="season",lat=lat,lon=lon,
-                timeUnit="year",varName="SLA_anomaly_SON",varUnit="m",
-                varDescription="Autumn mean sea level height anomalies in m",
-                timeStepVec_ncdf=c(1:18),fileName="SLA_anomaly_3deg_SON")
+anomalizeToNCDF(fileList=fileList,timeStepVec=c(9:11),fun=mean,yearsVec=1:18,seasonMonth="month",lat=lat,lon=lon,
+                timeUnit="year",varName="TP_anomaly",varUnit="mm/month",
+                varDescription="Total precipitation anomalies mm/month",
+                timeStepVec_ncdf=c(1:12),fileName="TP_anomaly")
 

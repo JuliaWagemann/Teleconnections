@@ -237,3 +237,29 @@ aggregate1 <- function(fileList,fun,aggVal,timeUnit,varName,varUnit,varDescripti
                 writeStackToNCDF(st,lat_new,lon_new,timeUnit,varName,varUnit,varDescription,timeStepVec, fileName)
         }
 }
+
+######################################################################################################
+# Function "createBigStack"
+# Function puts all netCDF files of a given fileList into one rasterStack and applies, if needed, a
+# conversion factor to the stack
+# Following parameters have to be specified:
+# Parameter required:   - path: path to netCDF files to be processed
+#                       - nameVector: specify vector of layer names
+#                       - convFactor: specify, if needed, a converstion factor the stack is multiplied with
+# Return: one big stack with all ncdf layers
+#####################################################################################################
+createBigStack <- function(path,nameVector,convFactor){
+        setwd(path)
+        fileList <- list.files(path,pattern=".nc")
+        st <- stack()
+        j <- 1
+       
+        for(i in fileList){
+                temp <- stack(i)
+                names(temp) <- paste(nameVector,j,sep="")
+                st <- addLayer(st,temp)               
+                j <- j+1
+        }
+        st <- st*convFactor
+        return (st)
+}
