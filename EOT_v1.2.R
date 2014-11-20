@@ -18,8 +18,8 @@ geoLon <- 360
 nrOfPixels <- geoLat*geoLon
 
 #what are the input and output paths?
-inputPath <- "C:/Users/francesca cecinati/Documents/Teleconnection_Analysis/Data/2_Anomalies/ERA_Interim/Tair_2m"
-outputPath <- "C:/Users/francesca cecinati/Documents/Teleconnection_Analysis/Data/6_EOT"
+inputPath <- "C:/Users/julia_francesca/Documents/Data/2_Anomalies/ERA_Interim/Tair_2m/"
+outputPath <- "C:/Users/julia_francesca/Documents/EOT/"
 
 #what is the input variable name and units?
 varNcdfName <- "t2m_anomaly"
@@ -57,6 +57,7 @@ for (files in 1:length(fileList)){
 var.eot <- eot(dataStack, resp = NULL, n=nOfEOT, standardized=FALSE, write.out=TRUE, path.out=outputPath, prefix="remote_test")
 
 modes <- var.eot@modes
+
 
 # writes the nOfEOT value layers, EOT vectors and variance values in a stack, a matrix and a vector
 

@@ -1,59 +1,50 @@
+%%R
+
 library(remote)
 library(latticeExtra)
 library(gridExtra)
-library(ncdf4)
-library(raster)
-
-source("C:/Users/Julia Wagemann/Desktop/Teleconnections/anomalies_functions_v1.1.R")
-
-data("australiaGPCP")
-data("pacificSST")
-
-path <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/3_Data/2_Anomalies/ERA_Interim/monthly/4_TP/3deg"
-path <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/3_Data/2_Anomalies/ERA_Interim/monthly/2_SLP/3deg"
+library(ncdf)
+library(MASS)
 
 
+setwd("C:/Users/julia_francesca/Desktop/Teleconnections")
+source("anomalies_functions_v1.1.R")
 
+path_resp <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/3_Data/2_Anomalies/ERA_Interim/monthly/4_TP/3deg"
+path_pred <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/3_Data/2_Anomalies/ERA_Interim/monthly/2_SLP/3deg"
 
-fileList_SLP <- list.files(path,pattern=".nc")
-fileList_TP <- list.files(path,pattern=".nc")
-anomaly <- open.ncdf(fileList_SLP[1], write=FALSE)
-var <- raster(get.var.ncdf(anomaly, "SLP_anomaly"))
-stack(var)
-
-st_SLP<- stack()
-j <- 1
+path_EOT <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/3_Data/4_Results/2_EOT/ERA_Interim/predictor_response/"
 nameVector <- c("Jan_", "Feb_", "Mar_", "Apr_", "May_", "Jun_", "Jul_","Aug_","Sep_","Oct_","Nov_","Dec_" )
 
 
 
-st.dns <- denoise(st,expl.var=0.9)
-st_TP.dns <- denoise(st_TP,expl.var=0.9)
-st_SLP.dns <- denoise(st_SLP,expl.var=0.9)
+setwd(path_resp)
+fileList <- list.files(pattern=".nc")
+lat_resp <- getLat(fileList[1])
+lon_resp <- getLon(fileList[1])
+
+setwd(path_pred)
+fileList <- list.files(pattern=".nc")
+lat_pred <- getLat(fileList[1])
+lon_pred <- getLon(fileList[1])
+
+st_resp <- createBigStack(path_resp,nameVector,1000)
+st_pred <- createBigStack(path_pred,nameVector,0.01)
+
+lagged <- lagalize(st_pred,st_resp,lag=6,freq=12)
 
 
-
-sst.pred <- deseason(pacificSST, cycle.window = 12)
-gpcp.resp <- deseason(australiaGPCP, cycle.window = 12)
-
-sst.pred.dns <- denoise(sst.pred, expl.var = 0.9)
-gpcp.resp.dns <- denoise(gpcp.resp,expl.var = 0.9)
+st_resp.dns <- denoise(st_resp,expl.var=0.9)
+st_pred.dns <- denoise(st_pred,expl.var=0.9)
 
 
-
-
-modes <- eot(x = st_SLP.dns, y = st_TP.dns, 
+modes <- eot(x = st_pred.dns, y = st_resp.dns, 
              n = 3, standardised = FALSE, 
              reduce.both = FALSE, print.console = TRUE)
-
-plot(modes, 1, 
-        show.eot.loc = TRUE, 
-        arrange = "lon")
+add <- paste("lag_",i,sep="")
+writeEOTOutput(path_EOT,modes,"SLP","TP",lat_pred,lon_pred,lat_resp,lon_resp,)
 
 
-
-
-opar <- par(mfrow=c(1,2))
-image(gpcp.resp[[1]],main="original")
-image(gpcp.resp.dns[[1]],main="deseasoned")
-par(opar)
+#plot(modes, 1, 
+#        show.eot.loc = TRUE, 
+#        arrange = "lon")

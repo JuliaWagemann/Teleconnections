@@ -11,15 +11,15 @@ library(ncdf4)
 library(fields)
 library(raster)
 # load necessary functions
-source("C:/Users/Julia Wagemann/Desktop/Teleconnections/SOM_functions_1.0.R")
+source("C:/Users/julia_francesca/Desktop/Teleconnections/SOM_functions_1.1.R")
 
 # path for input netcdf files
-path <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/2_Anomalies/ERA_Interim/monthly/2_SLP/1deg/"
+path <- "C:/Users/julia_francesca/Documents/Data/2_Anomalies/ERA_Interim/seasonal/3_summer/1_GP500/"
 # path for output files
-path1 <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/Data/4_Results/SOM/ERA_interim/SLP/"
+path1 <- "C:/Users/julia_francesca/Documents/Data/4_Results/SOM/ERA_interim/GP500/"
 
 setwd(path)
-fileList <- list.files(path, pattern=".nc")
+fileList <- list.files(path, pattern="_1deg.nc")
 
 ######################################################################################################
 # Call of function "SOMToNCDF"
@@ -40,6 +40,6 @@ fileList <- list.files(path, pattern=".nc")
 # ncdfFileName  -       provide file name of resulting netCDF file
 #####################################################################################################
 SOMToNCDF(fileList,gridSize1=3, gridSize2=4,neighbourhoodRadius=5,trainingRate=500,
-          path=path1,freqFileName="SOM_freqs.txt",timeUnit="SOM_nodes",
-          varName="SOMs",varUnit="",varDescription="SOM nodes of ERA-interim monthly SLP anomalies",
-          ncdfFileName="SLP_SOM_monthly_1deg")
+          path=path1,freqFileName="SOM_MAM_freqs.txt",timeUnit="SOM_nodes_MAM",
+          varName="SOMs",varUnit="",varDescription="SOM nodes of ERA-interim spring TP anomalies",
+          ncdfFileName="TP_SOM_MAM_1deg")

@@ -150,7 +150,7 @@ writeStackToNCDF <-function(stack,lon,lat,timeUnit,varName,varUnit,varDescriptio
         netCDFFile <- nc_create(paste(fileName,".nc",sep=""), netCDF_varDef, force_v4=FALSE,verbose=FALSE)
         
         # fill the created netCDF file with the actual content --> calculated anomalies
-        ncvar_put(netCDFFile, varName, as.matrix(brick(codeStack)),verbose=FALSE)
+        ncvar_put(netCDFFile, varName, as.matrix(brick(stack)),verbose=FALSE)
         # close the created netCDF file
         nc_close(netCDFFile)
 }

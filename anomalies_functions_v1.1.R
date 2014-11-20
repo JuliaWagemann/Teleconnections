@@ -5,6 +5,9 @@
 # Date:         2014/10/01
 ################################################################################
 
+library(ncdf4)
+library(raster)
+
 ###############################################################################
 # Function "getLat" is a help function to retrieve the values for the latitude
 # dimension of the input netcdf-files
@@ -262,4 +265,36 @@ createBigStack <- function(path,nameVector,convFactor){
         }
         st <- st*convFactor
         return (st)
+}
+
+writeEOTOutput <- function(path,EOTStack,pred,resp,lat_pred,lon_pred,lat_resp,lon_resp,add){
+  predictStack <- stack()
+  responseStack <- stack()
+  nrow <- nlayers(st_SLP)
+  matrix1 <- matrix(nrow=nrow,ncol=nmodes(EOTStack))
+  matrix2 <- matrix(nrow=nmodes(EOTStack),ncol=3)
+  
+  for(i in 1:nmodes(EOTStack)){
+    tempMode <- EOTStack@modes[[i]]
+    predictStack <- addLayer(predictStack,tempMode@rsq_predictor)
+    responseStack <- addLayer(responseStack,tempMode@r_response)
+    matrix1[,i] <- tempMode@eot
+    matrix2[i,] <- c(tempMode@cum_exp_var,tempMode@coords_bp)  
+  }
+  writeStackToNCDF(stack=predictStack,lat=lat_pred,lon=lon_pred,
+                   timeUnit="EOTmodes",varName=paste("EOT_predictor_",pred,sep=""),
+                   varUnit="",
+                   varDescription='coefficient of determination between base point and each pixel of the predictor domain',
+                   timeStepVec=c(1:3),
+                   fileName=paste(path,"predictor_",pred,"_",resp,add,sep=""))
+  
+  writeStackToNCDF(stack=responseStack,lat=lat_resp,lon=lon_resp,
+                   timeUnit="EOTmodes",varName="EOT_response",
+                   varUnit="",
+                   varDescription='correlation coefficients between base point and each pixel of the predictor domain',
+                   timeStepVec=c(1:3),
+                   fileName=paste(path,"response_",pred,"_",resp,add,sep=""))
+  
+  write.matrix(matrix1,file=paste(path,"EOT_ts_",pred,"_",resp,add,".txt",sep=""))
+  write.matrix(matrix2,file=paste(path,"EOT_EV_BP_",pred,"_",resp,add,".txt",sep=""))  
 }
