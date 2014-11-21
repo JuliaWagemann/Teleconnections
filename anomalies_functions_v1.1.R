@@ -267,10 +267,10 @@ createBigStack <- function(path,nameVector,convFactor){
         return (st)
 }
 
-writeEOTOutput <- function(path,EOTStack,pred,resp,lat_pred,lon_pred,lat_resp,lon_resp,add){
+writeEOTOutput <- function(path,EOTStack,nrLayers,pred,resp,lat_pred,lon_pred,lat_resp,lon_resp,add){
   predictStack <- stack()
   responseStack <- stack()
-  nrow <- nlayers(st_SLP)
+  nrow <- nlayers(nrLayers)
   matrix1 <- matrix(nrow=nrow,ncol=nmodes(EOTStack))
   matrix2 <- matrix(nrow=nmodes(EOTStack),ncol=3)
   
