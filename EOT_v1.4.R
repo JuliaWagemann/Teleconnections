@@ -30,7 +30,7 @@ lon_pred <- getLon(fileList[1])
 st_resp <- createBigStack(path_resp,nameVector,1000)
 st_pred <- createBigStack(path_pred,nameVector,0.01)
 
-lag_vec <- c(0:0)
+lag_vec <- c(1:12)
 for(i in lag_vec){
   lagged <- lagalize(st_pred,st_resp,lag=i,freq=12)
   
@@ -43,7 +43,7 @@ for(i in lag_vec){
                n = 3, standardised = FALSE, 
                reduce.both = FALSE, print.console = TRUE)
   
-  add <- paste("lag_",i,sep="")
+  add <- paste("_lag_",i,sep="")
   writeEOTOutput(path_EOT,modes,nrLayers,"SLP","TP",lat_pred,lon_pred,lat_resp,lon_resp,add)
 }
 
