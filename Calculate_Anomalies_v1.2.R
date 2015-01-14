@@ -16,7 +16,7 @@ library(ncdf4)
 source("C:/Users/Julia Wagemann/Desktop/Teleconnections/anomalies_functions_v1.1.R")
 
 # Set working directory
-path <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/3_Data/1_Raw_Data_NCDF/ERA_Interim/Total_Precipitation/3deg"
+path <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/3_Data/1_Raw_Data_NCDF/ERA_Interim/Tair_2m/3deg/1990-2011"
 setwd(path)
 
 fileList <- list.files(path)
@@ -43,8 +43,8 @@ lon <- getLon(fileList[1])
 #                       monthly anomalies of ERA-interim (1:12) 
 # fileName      -       provide file name of resulting netCDF file
 #####################################################################################################
-anomalizeToNCDF(fileList=fileList,timeStepVec=c(9:11),fun=mean,yearsVec=1:18,seasonMonth="month",lat=lat,lon=lon,
-                timeUnit="year",varName="TP_anomaly",varUnit="mm/month",
-                varDescription="Total precipitation anomalies mm/month",
-                timeStepVec_ncdf=c(1:12),fileName="TP_anomaly")
+anomalizeToNCDF(fileList=fileList,timeStepVec=c(1:12),fun=mean,yearsVec=1:22,seasonMonth="month",lat=lat,lon=lon,
+                timeUnit="year",varName="Tair_2m_anomaly",varUnit="degC",
+                varDescription="Air temperature at 2m anomalies in degC",
+                timeStepVec_ncdf=c(1:12),fileName="Tair2m_1990-2011_anomaly")
 
