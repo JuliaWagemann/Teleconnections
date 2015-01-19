@@ -7,6 +7,7 @@
 
 library(ncdf4)
 library(raster)
+library(MASS)
 
 ###############################################################################
 # Function "getLat" is a help function to retrieve the values for the latitude
@@ -276,6 +277,8 @@ createBigStack <- function(path,nameVector,convFactor){
 # Following parameters have to be specified:
 # Parameter required:   - path: path where the output should be written
 #                       - EOTStack: resulting object of an EOT analysis
+#                       - driver: EOT caclulation mode - if driver=FALSE, the regression-base approach
+#                         is used
 #                       - nrLayers: number of layers of the created big stack
 #                       - pred: string of predictor variable, e.g. "SST"
 #                       - resp: string of response variable, e.g. "Tair2m"
@@ -284,22 +287,26 @@ createBigStack <- function(path,nameVector,convFactor){
 #                       - add: supplement for file naming extension
 # Return: 
 #####################################################################################################
-writeEOTOutput <- function(path,EOTStack,nrLayers,pred,resp,lat_pred,lon_pred,lat_resp,lon_resp,add){
+writeEOTOutput <- function(path,EOTStack,driver=FALSE,nrLayers,pred,resp,lat_pred,lon_pred,lat_resp,lon_resp,add){
   # Initialize predictor and response stack
-  predictStack <- stack()
+
   responseStack <- stack()
+  
+  nrOfModes <- nmodes(EOTStack)
   
   # Initialize two matrix for .txt file outputs
   matrix1 <- matrix(nrow=nrLayers,ncol=nmodes(EOTStack))
-  matrix2 <- matrix(nrow=nmodes(EOTStack),ncol=3)
-  
+  matrix2 <- matrix(nrow=nrOfModes,ncol=3)
+
   # Loop through amount of modes in EOTStack
-  for(i in 1:nmodes(EOTStack)){
+  for(i in 1:nrOfModes){
     # extract first mode of EOTStack
     tempMode <- EOTStack@modes[[i]]
-    
-    # Extract predictor EOT
-    predictStack <- addLayer(predictStack,tempMode@rsq_predictor)
+    if(driver==TRUE){
+      predictStack <- stack()
+      # Extract predictor EOT
+      predictStack <- addLayer(predictStack,tempMode@rsq_predictor)
+    } else
     # Extract response EOT
     responseStack <- addLayer(responseStack,tempMode@r_response)
     # add EOT ts to first matrix
@@ -307,20 +314,24 @@ writeEOTOutput <- function(path,EOTStack,nrLayers,pred,resp,lat_pred,lon_pred,la
     # add EOT bp and EV to 2nd matrix
     matrix2[i,] <- c(tempMode@cum_exp_var,tempMode@coords_bp)  
   }
-  # write predictor stack to netCDF file
-  writeStackToNCDF(stack=predictStack,lat=lat_pred,lon=lon_pred,
-                   timeUnit="EOTmodes",varName=paste("EOT_predictor_",pred,sep=""),
-                   varUnit="",
-                   varDescription='coefficient of determination between base point and each pixel of the predictor domain',
-                   timeStepVec=c(1:3),
-                   fileName=paste(path,"predictor_",pred,"_",resp,add,sep=""))
-  # write response stack to netCDF file
+  if(exists("predictStack")==TRUE){
+    # write predictor stack to netCDF file
+    writeStackToNCDF(stack=predictStack,lat=lat_pred,lon=lon_pred,
+                     timeUnit="EOTmodes",varName=paste("EOT_predictor_",pred,sep=""),
+                     varUnit="",
+                     varDescription='coefficient of determination between base point and each pixel of the predictor domain',
+                     timeStepVec=c(1:nrOfModes),
+                     fileName=paste(path,"predictor_",pred,"_",resp,add,sep=""))
+  } else{}
+    # write response stack to netCDF file
+  
   writeStackToNCDF(stack=responseStack,lat=lat_resp,lon=lon_resp,
-                   timeUnit="EOTmodes",varName="EOT_response",
-                   varUnit="",
-                   varDescription='correlation coefficients between base point and each pixel of the predictor domain',
-                   timeStepVec=c(1:3),
-                   fileName=paste(path,"response_",pred,"_",resp,add,sep=""))
+                     timeUnit="EOTmodes",varName="EOT_response",
+                     varUnit="",
+                     varDescription='correlation coefficients between base point and each pixel of the predictor domain',
+                     timeStepVec=c(1:nrOfModes),
+                     fileName=paste(path,"response_",pred,"_",resp,add,sep=""))    
+ 
   # write both matrices to file
   write.matrix(matrix1,file=paste(path,"EOT_ts_",pred,"_",resp,add,".txt",sep=""))
   write.matrix(matrix2,file=paste(path,"EOT_EV_BP_",pred,"_",resp,add,".txt",sep=""))  

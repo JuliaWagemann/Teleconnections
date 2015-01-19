@@ -29,12 +29,12 @@ library(remote)
 library(ncdf)
 
 # Path to response data set (equivalent to y-variable in a regression)
-path_resp <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/3_Data/2_Anomalies/ERA_Interim/monthly/4_TP/3deg"
+path_resp <- "P:/2_Anomalies/ERA_Interim/monthly/4_TP/3deg"
 # Path to predictor data set (equivalent to x-variable in a regression)
-path_pred <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/3_Data/2_Anomalies/CCI/monthly/SST/3deg"
+path_pred <- "P:/2_Anomalies/CCI/monthly/SST/3deg"
 
 # Path, where output files shall be stored
-path_EOT <- "//TEC-JULIA-FRA/Users/julia_francesca/Documents/3_Data/4_ML_Results/2_EOT/predictor_response/"
+path_EOT <- "P:/4_ML_Results/2_EOT/predictor_response/"
 
 # Name vector to name raster layers in a coherent and understandable way
 nameVector <- c("Jan_", "Feb_", "Mar_", "Apr_", "May_", "Jun_", "Jul_","Aug_","Sep_","Oct_","Nov_","Dec_" )
@@ -78,5 +78,5 @@ for(i in lag_vec){
   add <- paste("_lag_",i,sep="")
   
   # write calculated results as output 
-  writeEOTOutput(path_EOT,modes,nrLayers,"SST","TP",lat_pred,lon_pred,lat_resp,lon_resp,add)
+  writeEOTOutput(path_EOT,modes,driver=TRUE,nrLayers,"SST","TP",lat_pred,lon_pred,lat_resp,lon_resp,add)
 }
