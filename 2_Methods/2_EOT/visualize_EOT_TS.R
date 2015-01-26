@@ -2,7 +2,7 @@
 # Name:         visualize_EOT_TS.R
 # Description:	This script retrieves time series values of calculated
 #				EOT analysis visualizes them in time.
-#				The result shows the time series of the identifies base point for
+#				The result shows the time series of the identified base point for
 #				the specific EOT mode.
 # version:      v1.0
 # Author:       Julia Wagemann
